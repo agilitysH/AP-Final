@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Courses</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+<header class="topbar">
+    <div class="container topbar__inner">
+        <a class="brand" href="/courses">Mini Moodle</a>
+        <nav class="nav">
+            <a class="nav__link" href="/courses">Курсы</a>
+            <a class="nav__link" href="/home">Главная</a>
+        </nav>
+    </div>
+</header>
+
+<main class="container">
+    <section class="hero">
+        <h1>Каталог курсов</h1>
+        <p class="muted">Поиск и фильтры используют API /courses.</p>
+    </section>
+
+    <section class="filters">
+        <input id="searchInput" class="input" type="text" placeholder="Поиск по названию" />
+        <input id="categoryInput" class="input" type="text" placeholder="Категория" />
+        <input id="teacherInput" class="input" type="text" placeholder="TeacherId" />
+        <select id="sortSelect" class="input">
+            <option value="createdAt_desc">Сначала новые</option>
+            <option value="createdAt_asc">Сначала старые</option>
+            <option value="title_asc">Название A-Z</option>
+            <option value="title_desc">Название Z-A</option>
+        </select>
+        <button id="searchBtn" class="btn" type="button">Искать</button>
+        <button id="resetBtn" class="btn" type="button">Сброс</button>
+    </section>
+
+    <div id="status" class="status muted">Загрузка...</div>
+    <div id="coursesGrid" class="grid"></div>
+
+    <div class="pager">
+        <button id="prevBtn" class="btn" type="button">Назад</button>
+        <div id="pageLabel" class="muted">Страница 1</div>
+        <button id="nextBtn" class="btn" type="button">Вперёд</button>
+    </div>
+</main>
+
+<script src="/static/courses.js"></script>
+</body>
+</html>

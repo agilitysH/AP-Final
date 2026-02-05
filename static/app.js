@@ -7,9 +7,10 @@ async function loadCourses() {
     status.textContent = "Загрузка...";
 
     try {
-        const res = await fetch(`${API_BASE}/course`);
+        const res = await fetch(`${API_BASE}/courses?limit=50`, {
+            headers: { "Accept": "application/json" }
+        });
 
-        // Если сервер вернул 401, значит Middleware нас не пустил
         if (res.status === 401) {
             status.textContent = "Ошибка: Войдите в систему (Unauthorized).";
             return;
@@ -20,7 +21,8 @@ async function loadCourses() {
             return;
         }
 
-        const courses = await res.json();
+        const data = await res.json();
+        const courses = data.items || [];
         if (!Array.isArray(courses) || courses.length === 0) {
             status.textContent = "Курсов пока нет.";
             return;
@@ -35,8 +37,8 @@ async function loadCourses() {
                 <div class="card__title">${escapeHtml(c.title ?? "Без названия")}</div>
                 <div class="card__meta">ID: ${c.id}</div>
                 <div style="margin-top: 12px; display: flex; gap: 8px;">
-                    <button class="btn" onclick="editCourse('${c.id}', '${escapeHtml(c.title)}')">✏️ Изменить</button>
-                    <button class="btn" style="color: #ff5b5b; border-color: rgba(255,91,91,0.3)" onclick="deleteCourse('${c.id}')">🗑️ Удалить</button>
+                    <button class="btn" onclick="editCourse('${c.id}', '${escapeHtml(c.title)}')">Изменить</button>
+                    <button class="btn" style="color: #ff5b5b; border-color: rgba(255,91,91,0.3)" onclick="deleteCourse('${c.id}')">Удалить</button>
                 </div>
             `;
             grid.appendChild(card);
@@ -50,7 +52,7 @@ async function deleteCourse(id) {
     if (!confirm("Вы уверены, что хотите удалить этот курс?")) return;
 
     try {
-        const res = await fetch(`${API_BASE}/course/${id}`, { method: "DELETE" });
+        const res = await fetch(`${API_BASE}/courses/${id}`, { method: "DELETE" });
         if (res.ok) {
             loadCourses();
         } else {
@@ -67,8 +69,8 @@ async function editCourse(id, currentTitle) {
     if (!newTitle || newTitle === currentTitle) return;
 
     try {
-        const res = await fetch(`${API_BASE}/course/${id}`, {
-            method: "PUT",
+        const res = await fetch(`${API_BASE}/courses/${id}`, {
+            method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ title: newTitle })
         });

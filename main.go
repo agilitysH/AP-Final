@@ -1,9 +1,11 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/joho/godotenv"
 
@@ -20,6 +22,11 @@ func main() {
 	}
 
 	db.Connect(mongoURI)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err := db.EnsureIndexes(ctx); err != nil {
+		log.Fatal(err)
+	}
 
 	// Инициализируем маршруты
 	routes.RegisterRoutes()
