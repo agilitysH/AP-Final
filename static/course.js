@@ -28,7 +28,10 @@ async function loadCourse() {
     modulesEl.innerHTML = "";
 
     try {
-        const res = await fetch(`/courses/${courseId}`, { headers: { "Accept": "application/json" } });
+        const res = await fetch(`/courses/${courseId}?format=json`, {
+            headers: { "Accept": "application/json" },
+            cache: "no-store"
+        });
         if (!res.ok) {
             statusEl.textContent = `Ошибка загрузки: ${res.status}`;
             return;

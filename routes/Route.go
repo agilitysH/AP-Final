@@ -21,7 +21,7 @@ func RegisterRoutes() {
 	// 2. КУРСЫ (HTML + API)
 	http.HandleFunc("GET /courses", func(w http.ResponseWriter, r *http.Request) {
 		// Если запрос НЕ содержит application/json в заголовке Accept, отдаем HTML
-		if !strings.Contains(r.Header.Get("Accept"), "application/json") {
+		if r.URL.Query().Get("format") != "json" && !strings.Contains(r.Header.Get("Accept"), "application/json") {
 			http.ServeFile(w, r, "views/courses.html")
 			return
 		}
@@ -30,7 +30,7 @@ func RegisterRoutes() {
 	})
 
 	http.HandleFunc("GET /courses/{id}", func(w http.ResponseWriter, r *http.Request) {
-		if !strings.Contains(r.Header.Get("Accept"), "application/json") {
+		if r.URL.Query().Get("format") != "json" && !strings.Contains(r.Header.Get("Accept"), "application/json") {
 			http.ServeFile(w, r, "views/course.html")
 			return
 		}
