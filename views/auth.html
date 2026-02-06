@@ -1,10 +1,49 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Auth</title>
+    <title>Вход / Регистрация</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <style>
+        .auth-box { max-width: 400px; margin: 100px auto; padding: 30px; background: var(--panel); border-radius: 16px; border: 1px solid var(--border); }
+        .auth-box h1 { margin-bottom: 24px; text-align: center; }
+        .auth-box input { width: 100%; margin-bottom: 12px; display: block; }
+    </style>
 </head>
 <body>
+<div class="auth-box">
+    <h1 id="title">Вход</h1>
+    <input type="text" id="user" class="input" placeholder="Логин">
+    <input type="password" id="pass" class="input" placeholder="Пароль">
+    <button onclick="auth()" class="btn" style="width: 100%">Продолжить</button>
+    <p style="text-align: center; margin-top: 15px;">
+        <a href="javascript:void(0)" onclick="toggle()" id="link" class="muted">Нет аккаунта? Регистрация</a>
+    </p>
+</div>
 
+<script>
+    let mode = 'login';
+    function toggle() {
+        mode = (mode === 'login') ? 'register' : 'login';
+        document.getElementById('title').innerText = mode === 'login' ? 'Вход' : 'Регистрация';
+        document.getElementById('link').innerText = mode === 'login' ? 'Нет аккаунта? Регистрация' : 'Есть аккаунт? Войти';
+    }
+
+    async function auth() {
+        const username = document.getElementById('user').value;
+        const password = document.getElementById('pass').value;
+        const res = await fetch('/' + mode, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({username, password})
+        });
+        if (res.ok) {
+            alert('Успешно!');
+            window.location.href = '/home';
+        } else {
+            alert('Ошибка: ' + await res.text());
+        }
+    }
+</script>
 </body>
 </html>
