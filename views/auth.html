@@ -1,49 +1,128 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Вход / Регистрация</title>
     <link rel="stylesheet" href="/static/styles.css">
-    <style>
-        .auth-box { max-width: 400px; margin: 100px auto; padding: 30px; background: var(--panel); border-radius: 16px; border: 1px solid var(--border); }
-        .auth-box h1 { margin-bottom: 24px; text-align: center; }
-        .auth-box input { width: 100%; margin-bottom: 12px; display: block; }
-    </style>
 </head>
-<body>
-<div class="auth-box">
-    <h1 id="title">Вход</h1>
-    <input type="text" id="user" class="input" placeholder="Логин">
-    <input type="password" id="pass" class="input" placeholder="Пароль">
-    <button onclick="auth()" class="btn" style="width: 100%">Продолжить</button>
-    <p style="text-align: center; margin-top: 15px;">
-        <a href="javascript:void(0)" onclick="toggle()" id="link" class="muted">Нет аккаунта? Регистрация</a>
-    </p>
-</div>
+<body class="page-auth">
+<main class="auth-shell">
+    <section class="auth-panel">
+        <div class="eyebrow">Mini Moodle</div>
+        <h1 id="authHeadline">Вход в личный кабинет</h1>
+        <p class="hero__subtitle" id="authSubtitle">Авторизуйтесь, чтобы записываться на курсы и отмечать прогресс.</p>
+        <ul class="auth-panel__list">
+            <li>Подбор курсов по категориям и преподавателям.</li>
+            <li>Удобная запись и мгновенный доступ к материалам.</li>
+            <li>Прогресс и оценки в одном окне.</li>
+        </ul>
+    </section>
+
+    <section class="card auth-card">
+        <h2 id="title">Вход</h2>
+        <p class="muted" id="helper">Введите логин и пароль.</p>
+        <form id="authForm" class="form">
+            <label class="field">
+                <span class="field__label">Логин</span>
+                <input type="text" id="user" class="input" placeholder="Например, student01" autocomplete="username" required>
+            </label>
+            <label class="field">
+                <span class="field__label">Пароль</span>
+                <input type="password" id="pass" class="input" placeholder="Введите пароль" autocomplete="current-password" required>
+            </label>
+            <div class="form__actions">
+                <button id="authBtn" class="btn btn--primary" type="submit">Войти</button>
+                <button id="toggleBtn" class="btn btn--ghost" type="button">Регистрация</button>
+            </div>
+            <div id="authStatus" class="status is-hidden"></div>
+            <div id="footerText" class="auth-footer">Нет аккаунта? Нажмите «Регистрация».</div>
+        </form>
+    </section>
+</main>
 
 <script>
-    let mode = 'login';
-    function toggle() {
-        mode = (mode === 'login') ? 'register' : 'login';
-        document.getElementById('title').innerText = mode === 'login' ? 'Вход' : 'Регистрация';
-        document.getElementById('link').innerText = mode === 'login' ? 'Нет аккаунта? Регистрация' : 'Есть аккаунт? Войти';
+    const form = document.getElementById("authForm");
+    const userInput = document.getElementById("user");
+    const passInput = document.getElementById("pass");
+    const statusEl = document.getElementById("authStatus");
+    const titleEl = document.getElementById("title");
+    const helperEl = document.getElementById("helper");
+    const toggleBtn = document.getElementById("toggleBtn");
+    const authBtn = document.getElementById("authBtn");
+    const footerText = document.getElementById("footerText");
+    const headlineEl = document.getElementById("authHeadline");
+    const subtitleEl = document.getElementById("authSubtitle");
+
+    let mode = "login";
+
+    function setStatus(message, tone) {
+        statusEl.textContent = message || "";
+        statusEl.className = "status" + (tone ? " status--" + tone : "") + (message ? "" : " is-hidden");
     }
 
-    async function auth() {
-        const username = document.getElementById('user').value;
-        const password = document.getElementById('pass').value;
-        const res = await fetch('/' + mode, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({username, password})
-        });
-        if (res.ok) {
-            alert('Успешно!');
-            window.location.href = '/home';
-        } else {
-            alert('Ошибка: ' + await res.text());
-        }
+    function setMode(next) {
+        mode = next;
+        const isLogin = mode === "login";
+        titleEl.textContent = isLogin ? "Вход" : "Регистрация";
+        helperEl.textContent = isLogin ? "Введите логин и пароль." : "Создайте аккаунт, чтобы записываться на курсы.";
+        toggleBtn.textContent = isLogin ? "Регистрация" : "Уже есть аккаунт";
+        authBtn.textContent = isLogin ? "Войти" : "Создать аккаунт";
+        footerText.textContent = isLogin
+            ? "Нет аккаунта? Нажмите «Регистрация»."
+            : "Уже есть аккаунт? Переключитесь на вход.";
+        headlineEl.textContent = isLogin ? "Вход в личный кабинет" : "Создайте аккаунт";
+        subtitleEl.textContent = isLogin
+            ? "Авторизуйтесь, чтобы записываться на курсы и отмечать прогресс."
+            : "Регистрация занимает минуту, а курсы доступны сразу.";
+        passInput.autocomplete = isLogin ? "current-password" : "new-password";
+        setStatus("", "");
     }
+
+    toggleBtn.addEventListener("click", () => setMode(mode === "login" ? "register" : "login"));
+
+    form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const username = userInput.value.trim();
+        const password = passInput.value;
+
+        if (!username || !password) {
+            setStatus("Введите логин и пароль.", "error");
+            return;
+        }
+
+        authBtn.disabled = true;
+        toggleBtn.disabled = true;
+        setStatus("Отправляем запрос...", "info");
+
+        try {
+            const res = await fetch("/" + mode, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, password })
+            });
+
+            if (res.ok) {
+                if (mode === "register") {
+                    setMode("login");
+                    setStatus("Аккаунт создан. Теперь войдите.", "success");
+                } else {
+                    setStatus("Успешный вход. Переходим...", "success");
+                    setTimeout(() => {
+                        window.location.href = "/home";
+                    }, 500);
+                }
+            } else {
+                const errorText = await res.text();
+                setStatus(errorText || "Ошибка авторизации.", "error");
+            }
+        } catch (e) {
+            setStatus("Ошибка сети. Проверьте соединение.", "error");
+        } finally {
+            authBtn.disabled = false;
+            toggleBtn.disabled = false;
+        }
+    });
 </script>
 </body>
 </html>

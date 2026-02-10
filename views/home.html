@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="ru">
 <head>
     <meta charset="utf-8" />
@@ -9,30 +9,70 @@
 <body>
 <header class="topbar">
     <div class="container topbar__inner">
-        <a class="brand" href="/">Mini Moodle</a>
+        <a class="brand" href="/home">Mini Moodle</a>
 
         <nav class="nav">
             <a class="nav__link" href="/home">Главная</a>
             <a class="nav__link" href="/courses">Курсы</a>
-            <a class="nav__link" href="/auth">Личный кабинет</a>
+            <a class="nav__link" href="/auth">Вход / Профиль</a>
         </nav>
     </div>
 </header>
 
 <main class="container">
-    <section class="hero">
-        <h1>Welcome to Mini Moodle</h1>
-        <p class="muted">Выберите курс из списка ниже.</p>
+    <section class="hero hero--split">
+        <div>
+            <h1 class="hero__title">Учитесь быстрее и держите прогресс под контролем.</h1>
+            <p class="hero__subtitle">Подбирайте курсы по категориям, записывайтесь в пару кликов и обновляйте статус каждого задания.</p>
+            <div class="hero__actions">
+                <a class="btn btn--primary" href="/courses">Каталог курсов</a>
+                <a class="btn btn--ghost" href="/auth">Войти</a>
+            </div>
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat__value" id="statCourses">—</div>
+                    <div class="stat__label">курсов доступно</div>
+                </div>
+                <div class="stat">
+                    <div class="stat__value">24/7</div>
+                    <div class="stat__label">доступ к материалам</div>
+                </div>
+                <div class="stat">
+                    <div class="stat__value">3 шага</div>
+                    <div class="stat__label">поиск, запись, прогресс</div>
+                </div>
+            </div>
+        </div>
+        <div class="hero__art">
+            <div class="orb orb--a"></div>
+            <div class="orb orb--b"></div>
+            <div class="hero__card">
+                <div class="hero__card-label">Новый спринт</div>
+                <div class="hero__card-title">Go + MongoDB</div>
+            <div class="hero__card-row"><span>Модули</span> <strong>6</strong></div>
+            <div class="hero__card-row"><span>Практика</span> <strong>12</strong></div>
+            <div class="hero__card-row"><span>Готовность</span> <strong>72%</strong></div>
+                <a class="btn btn--light btn--sm" href="/courses">Посмотреть</a>
+            </div>
+            <div class="hero__card hero__card--mini">
+                <div class="hero__card-label">Фокус недели</div>
+                <div class="hero__card-title">API дизайн</div>
+            <div class="hero__card-row"><span>Дедлайн</span> <strong>2 дня</strong></div>
+            </div>
+        </div>
     </section>
 
     <section id="courses">
         <div class="section-head">
-            <h2>Доступные курсы</h2>
-            <button id="reloadBtn" class="btn" type="button">Обновить</button>
+            <div>
+                <h2>Свежие курсы</h2>
+                <p class="muted">Подборка новых программ прямо из каталога.</p>
+            </div>
+            <button id="reloadBtn" class="btn btn--ghost" type="button">Обновить</button>
         </div>
 
-        <div id="status" class="status muted">Загрузка...</div>
-        <div id="coursesGrid" class="grid"></div>
+        <div id="status" class="status is-hidden"></div>
+        <div id="coursesGrid" class="grid stagger"></div>
     </section>
 </main>
 

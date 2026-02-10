@@ -1,50 +1,96 @@
-const API_BASE = "";
+﻿const API_BASE = "";
+
+const statusEl = document.getElementById("status");
+const grid = document.getElementById("coursesGrid");
+const reloadBtn = document.getElementById("reloadBtn");
+const statCourses = document.getElementById("statCourses");
+
+function setStatus(message, tone) {
+    if (!statusEl) return;
+    statusEl.textContent = message || "";
+    statusEl.className = "status" + (tone ? " status--" + tone : "") + (message ? "" : " is-hidden");
+}
+
+function escapeHtml(s) {
+    return String(s)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+function truncate(text, maxLen) {
+    const value = String(text || "");
+    if (value.length <= maxLen) return value;
+    return value.slice(0, maxLen).trimEnd() + "...";
+}
 
 async function loadCourses() {
-    const status = document.getElementById("status");
-    const grid = document.getElementById("coursesGrid");
+    if (!grid || !statusEl) return;
     grid.innerHTML = "";
-    status.textContent = "Загрузка...";
+    setStatus("Загрузка...", "info");
 
     try {
-        const res = await fetch(`${API_BASE}/courses?limit=50`, {
+        const res = await fetch(`${API_BASE}/courses?limit=6`, {
             headers: { "Accept": "application/json" }
         });
 
         if (res.status === 401) {
-            status.textContent = "Ошибка: Войдите в систему (Unauthorized).";
+            statusEl.innerHTML = "Нужна авторизация. <a href=\"/auth\">Войти</a>";
+            statusEl.className = "status status--error";
             return;
         }
 
         if (!res.ok) {
-            status.textContent = `Ошибка: ${res.status}`;
+            setStatus(`Ошибка загрузки: ${res.status}`, "error");
             return;
         }
 
         const data = await res.json();
         const courses = data.items || [];
+        if (statCourses) statCourses.textContent = data.total ?? courses.length;
+
         if (!Array.isArray(courses) || courses.length === 0) {
-            status.textContent = "Курсов пока нет.";
+            setStatus("Курсов пока нет.", "info");
             return;
         }
 
-        status.textContent = "";
+        setStatus("", "");
 
-        courses.forEach(c => {
-            const card = document.createElement("div");
+        courses.forEach((course, index) => {
+            const card = document.createElement("article");
             card.className = "card";
+            card.style.setProperty("--i", index);
+            const title = escapeHtml(course.title || "Без названия");
+            const category = escapeHtml(course.category || "Без категории");
+            const description = escapeHtml(truncate(course.description || "Описание пока не заполнено.", 120));
+            const id = escapeHtml(course.id || "");
+
             card.innerHTML = `
-                <div class="card__title">${escapeHtml(c.title ?? "Без названия")}</div>
-                <div class="card__meta">ID: ${c.id}</div>
-                <div style="margin-top: 12px; display: flex; gap: 8px;">
-                    <button class="btn" onclick="editCourse('${c.id}', '${escapeHtml(c.title)}')">Изменить</button>
-                    <button class="btn" style="color: #ff5b5b; border-color: rgba(255,91,91,0.3)" onclick="deleteCourse('${c.id}')">Удалить</button>
+                <span class="badge">${category}</span>
+                <div class="card__title">${title}</div>
+                <div class="card__desc">${description}</div>
+                <div class="card__meta">ID: ${id}</div>
+                <div class="card__actions">
+                    <a class="btn btn--primary btn--sm" href="/courses/${id}">Открыть</a>
+                    <button class="btn btn--ghost btn--sm" type="button" data-action="edit">Изменить</button>
+                    <button class="btn btn--danger btn--sm" type="button" data-action="delete">Удалить</button>
                 </div>
             `;
+
+            card.querySelector("[data-action='edit']").addEventListener("click", () => {
+                editCourse(course.id, course.title || "");
+            });
+
+            card.querySelector("[data-action='delete']").addEventListener("click", () => {
+                deleteCourse(course.id);
+            });
+
             grid.appendChild(card);
         });
     } catch (e) {
-        status.textContent = "Ошибка подключения к API.";
+        setStatus("Ошибка подключения к API.", "error");
     }
 }
 
@@ -54,13 +100,13 @@ async function deleteCourse(id) {
     try {
         const res = await fetch(`${API_BASE}/courses/${id}`, { method: "DELETE" });
         if (res.ok) {
-            loadCourses();
+            await loadCourses();
         } else {
             const errText = await res.text();
-            alert("Ошибка удаления: " + errText);
+            setStatus(errText || "Ошибка удаления.", "error");
         }
     } catch (e) {
-        alert("Ошибка сети");
+        setStatus("Ошибка сети.", "error");
     }
 }
 
@@ -76,18 +122,18 @@ async function editCourse(id, currentTitle) {
         });
 
         if (res.ok) {
-            loadCourses();
+            await loadCourses();
         } else {
-            alert("Ошибка при обновлении");
+            const errText = await res.text();
+            setStatus(errText || "Ошибка при обновлении.", "error");
         }
     } catch (e) {
-        alert("Ошибка сети");
+        setStatus("Ошибка сети.", "error");
     }
 }
 
-function escapeHtml(s) {
-    return s.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+if (reloadBtn) {
+    reloadBtn.addEventListener("click", loadCourses);
 }
 
-document.getElementById("reloadBtn").addEventListener("click", loadCourses);
 loadCourses();

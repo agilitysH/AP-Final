@@ -1,9 +1,9 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="ru">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Course</title>
+    <title>Курс</title>
     <link rel="stylesheet" href="/static/styles.css" />
 </head>
 <body>
@@ -13,20 +13,35 @@
         <nav class="nav">
             <a class="nav__link" href="/courses">Курсы</a>
             <a class="nav__link" href="/home">Главная</a>
+            <a class="nav__link" href="/auth">Вход</a>
         </nav>
     </div>
 </header>
 
 <main class="container">
     <section class="hero">
-        <h1 id="courseTitle">Курс</h1>
-        <p id="courseMeta" class="muted"></p>
+        <div class="course-head">
+            <div>
+                <p class="eyebrow">Курс</p>
+                <h1 id="courseTitle">Курс</h1>
+                <p id="courseDescription" class="hero__subtitle"></p>
+                <div class="hero__actions" id="courseActions">
+                    <button id="enrollBtn" class="btn btn--primary" type="button">Записаться</button>
+                    <a class="btn btn--ghost" href="/courses">К каталогу</a>
+                </div>
+            </div>
+            <div class="course-head__panel">
+                <span class="badge">Карточка курса</span>
+                <p id="courseMeta" class="muted"></p>
+                <div id="courseStatus" class="status is-hidden"></div>
+            </div>
+        </div>
     </section>
 
-    <div id="status" class="status muted">Загрузка...</div>
-    <div id="modules" class="modules"></div>
+    <div id="status" class="status is-hidden"></div>
+    <div id="modules" class="modules stagger"></div>
 </main>
 
-<script src="/static/course.js?v=2"></script>
+<script src="/static/course.js"></script>
 </body>
 </html>

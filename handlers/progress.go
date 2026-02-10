@@ -44,6 +44,43 @@ func UpdateProgress(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	pipeline := []bson.M{
+		{"$match": bson.M{"_id": courseOID}},
+		{"$unwind": "$modules"},
+		{"$unwind": "$modules.items"},
+		{"$match": bson.M{"modules.items._id": itemOID}},
+		{"$project": bson.M{"maxScore": "$modules.items.maxScore"}},
+	}
+
+	cursor, err := db.GetCollection("courses").Aggregate(ctx, pipeline)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "failed to load course item")
+		return
+	}
+	defer cursor.Close(ctx)
+
+	type itemScore struct {
+		MaxScore float64 `bson:"maxScore"`
+	}
+	if !cursor.Next(ctx) {
+		writeError(w, http.StatusNotFound, "course item not found")
+		return
+	}
+
+	var item itemScore
+	if err := cursor.Decode(&item); err != nil {
+		writeError(w, http.StatusInternalServerError, "failed to decode course item")
+		return
+	}
+
+	if input.Score > item.MaxScore {
+		writeError(w, http.StatusBadRequest, "score exceeds maxScore")
+		return
+	}
+
 	filter := bson.M{
 		"userId":   userID,
 		"courseId": courseOID,
@@ -62,9 +99,6 @@ func UpdateProgress(w http.ResponseWriter, r *http.Request) {
 
 	// Upsert: true создаст запись, если её нет в базе
 	opts := options.Update().SetUpsert(true)
-
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
 
 	if _, err := db.GetCollection("progress").UpdateOne(ctx, filter, update, opts); err != nil {
 		writeError(w, http.StatusInternalServerError, "failed to update progress")

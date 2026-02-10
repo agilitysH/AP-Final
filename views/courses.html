@@ -1,9 +1,9 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="ru">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Courses</title>
+    <title>Каталог курсов</title>
     <link rel="stylesheet" href="/static/styles.css" />
 </head>
 <body>
@@ -13,37 +13,58 @@
         <nav class="nav">
             <a class="nav__link" href="/courses">Курсы</a>
             <a class="nav__link" href="/home">Главная</a>
+            <a class="nav__link" href="/auth">Вход</a>
         </nav>
     </div>
 </header>
 
 <main class="container">
     <section class="hero">
-        <h1>Каталог курсов</h1>
-        <p class="muted">Поиск и фильтры используют API /courses.</p>
+        <p class="eyebrow">Каталог</p>
+        <h1>Курсы для вашего темпа</h1>
+        <p class="hero__subtitle">Фильтры используют API /courses. Настройте поиск и сразу переходите к материалам.</p>
     </section>
 
     <section class="filters">
-        <input id="searchInput" class="input" type="text" placeholder="Поиск по названию" />
-        <input id="categoryInput" class="input" type="text" placeholder="Категория" />
-        <input id="teacherInput" class="input" type="text" placeholder="TeacherId" />
-        <select id="sortSelect" class="input">
-            <option value="createdAt_desc">Сначала новые</option>
-            <option value="createdAt_asc">Сначала старые</option>
-            <option value="title_asc">Название A-Z</option>
-            <option value="title_desc">Название Z-A</option>
-        </select>
-        <button id="searchBtn" class="btn" type="button">Искать</button>
-        <button id="resetBtn" class="btn" type="button">Сброс</button>
+        <div class="filter-card">
+            <div class="filter-grid">
+                <label class="field">
+                    <span class="field__label">Название курса</span>
+                    <input id="searchInput" class="input" type="text" placeholder="Поиск по названию" />
+                </label>
+                <label class="field">
+                    <span class="field__label">Категория</span>
+                    <input id="categoryInput" class="input" type="text" placeholder="Например, Backend" />
+                </label>
+                <label class="field">
+                    <span class="field__label">Преподаватель (ID)</span>
+                    <input id="teacherInput" class="input" type="text" placeholder="ObjectId преподавателя" />
+                </label>
+                <label class="field">
+                    <span class="field__label">Сортировка</span>
+                    <select id="sortSelect" class="input">
+                        <option value="createdAt_desc">Сначала новые</option>
+                        <option value="createdAt_asc">Сначала старые</option>
+                        <option value="title_asc">Название A-Z</option>
+                        <option value="title_desc">Название Z-A</option>
+                    </select>
+                </label>
+            </div>
+            <div class="filter-actions">
+                <button id="searchBtn" class="btn btn--primary" type="button">Применить</button>
+                <button id="resetBtn" class="btn btn--ghost" type="button">Сброс</button>
+            </div>
+            <div id="filterSummary" class="filter-summary"></div>
+        </div>
     </section>
 
-    <div id="status" class="status muted">Загрузка...</div>
-    <div id="coursesGrid" class="grid"></div>
+    <div id="status" class="status is-hidden"></div>
+    <div id="coursesGrid" class="grid stagger"></div>
 
     <div class="pager">
-        <button id="prevBtn" class="btn" type="button">Назад</button>
+        <button id="prevBtn" class="btn btn--ghost" type="button">Назад</button>
         <div id="pageLabel" class="muted">Страница 1</div>
-        <button id="nextBtn" class="btn" type="button">Вперёд</button>
+        <button id="nextBtn" class="btn btn--ghost" type="button">Вперёд</button>
     </div>
 </main>
 
