@@ -80,6 +80,7 @@ function buildParams(page) {
     const params = new URLSearchParams();
     params.set("page", page);
     params.set("limit", 9);
+    params.set("format", "json");
     if (search) params.set("search", search);
     if (category) params.set("category", category);
     if (teacherId) params.set("teacherId", teacherId);

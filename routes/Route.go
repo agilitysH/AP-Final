@@ -17,6 +17,7 @@ func RegisterRoutes() {
 	})
 	http.HandleFunc("POST /register", handlers.Register)
 	http.HandleFunc("POST /login", handlers.Login)
+	http.HandleFunc("GET /me", handlers.GetMe)
 
 	// 2. КУРСЫ (HTML + API)
 	http.HandleFunc("GET /courses", func(w http.ResponseWriter, r *http.Request) {
@@ -49,7 +50,13 @@ func RegisterRoutes() {
 
 	// 5. ПРОГРЕСС И СТАТИСТИКА
 	http.HandleFunc("PUT /courses/{courseId}/items/{itemId}/progress", handlers.AuthMiddleware(handlers.UpdateProgress))
-	http.HandleFunc("GET /me/progress", handlers.AuthMiddleware(handlers.GetMyProgress))
+	http.HandleFunc("GET /me/progress", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Query().Get("format") != "json" && !strings.Contains(r.Header.Get("Accept"), "application/json") {
+			http.ServeFile(w, r, "views/progress.html")
+			return
+		}
+		handlers.AuthMiddleware(handlers.GetMyProgress)(w, r)
+	})
 
 	// 6. ЗАПИСЬ НА КУРС (Enrollments)
 	http.HandleFunc("POST /enrollments", handlers.AuthMiddleware(handlers.CreateEnrollment))

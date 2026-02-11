@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Мой прогресс</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+<header class="topbar">
+    <div class="container topbar__inner">
+        <a class="brand" href="/home">Mini Moodle</a>
+        <nav class="nav">
+            <a class="nav__link" href="/home">Главная</a>
+            <a class="nav__link" href="/courses">Курсы</a>
+            <a class="nav__link" href="/me/progress">Мой прогресс</a>
+            <a class="nav__link" href="/auth" id="navUser">Вход / Профиль</a>
+        </nav>
+    </div>
+</header>
+
+<main class="container">
+    <section class="hero">
+        <p class="eyebrow">Личный кабинет</p>
+        <h1>Мой прогресс</h1>
+        <p class="hero__subtitle">Сводка по курсам, в которые вы записаны, и выполненным заданиям.</p>
+        <div class="hero__actions">
+            <button id="refreshBtn" class="btn btn--ghost" type="button">Обновить</button>
+            <a class="btn btn--primary" href="/courses">Найти курс</a>
+        </div>
+    </section>
+
+    <section class="stats">
+        <div class="stat">
+            <div class="stat__value" id="statCourses">—</div>
+            <div class="stat__label">курсов в прогрессе</div>
+        </div>
+        <div class="stat">
+            <div class="stat__value" id="statDone">—</div>
+            <div class="stat__label">заданий выполнено</div>
+        </div>
+        <div class="stat">
+            <div class="stat__value" id="statCompletion">—</div>
+            <div class="stat__label">средний прогресс</div>
+        </div>
+        <div class="stat">
+            <div class="stat__value" id="statScore">—</div>
+            <div class="stat__label">средний балл</div>
+        </div>
+    </section>
+
+    <div id="status" class="status is-hidden"></div>
+    <div id="progressGrid" class="grid stagger"></div>
+</main>
+
+<script src="/static/nav.js"></script>
+<script src="/static/progress.js"></script>
+</body>
+</html>

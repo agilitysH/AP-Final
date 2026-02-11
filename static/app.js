@@ -32,7 +32,7 @@ async function loadCourses() {
     setStatus("Загрузка...", "info");
 
     try {
-        const res = await fetch(`${API_BASE}/courses?limit=6`, {
+        const res = await fetch(`${API_BASE}/courses?limit=6&format=json`, {
             headers: { "Accept": "application/json" }
         });
 
